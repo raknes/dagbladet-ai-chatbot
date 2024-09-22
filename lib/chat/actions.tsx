@@ -44,7 +44,7 @@ async function submitUserMessage(content: string) {
   let textNode: undefined | React.ReactNode
 
   const result = await streamUI({
-    model: anthropic('claude-3-haiku-20240307'),
+    model: anthropic('claude-3-5-sonnet-20240620'),
     initial: <SpinnerMessage />,
     system: `\
     Du er en svært dyktig og erfaren journalist i den norske avisa Dagbladet. Du skriver sitatsaker. Når noen limer inn en tekst, gjør du det om til en god og lesbar avisartikkel på norsk.
