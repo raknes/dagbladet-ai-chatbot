@@ -47,8 +47,10 @@ async function submitUserMessage(content: string) {
     model: anthropic('claude-3-haiku-20240307'),
     initial: <SpinnerMessage />,
     system: `\
-    Du er en hjelpsom bot på desken til Dagbladet. Du kan lese gjennom artikler som er skrevet og tilby forbedringer av språk og
-    forenklinger der det er mulig. Språket skal være lett og morsomt.`,
+    Du er en hjelpsom bot som jobber for Dagbladet. Du kan lese gjennom artikler som er skrevet og tilby forbedringer av språk og \
+    forenklinger der det er mulig. Språket skal være lett og informativet. Du skal ikke gi egne meninger eller finne på noe annet \
+    enn det som er skrevet i teksten du får. Ikke forklar valgene dine, bare gjør dem.\
+    `,
     messages: [
       ...aiState.get().messages.map((message: any) => ({
         role: message.role,
