@@ -1,14 +1,14 @@
 'use client'
 
-import { IconOpenAI, IconUser } from '@/components/ui/icons'
+import { IconAnthropic, IconUser } from '@/components/ui/icons'
+import { useStreamableText } from '@/lib/hooks/use-streamable-text'
 import { cn } from '@/lib/utils'
-import { spinner } from './spinner'
-import { CodeBlock } from '../ui/codeblock'
-import { MemoizedReactMarkdown } from '../markdown'
+import { StreamableValue } from 'ai/rsc'
 import remarkGfm from 'remark-gfm'
 import remarkMath from 'remark-math'
-import { StreamableValue } from 'ai/rsc'
-import { useStreamableText } from '@/lib/hooks/use-streamable-text'
+import { MemoizedReactMarkdown } from '../markdown'
+import { CodeBlock } from '../ui/codeblock'
+import { spinner } from './spinner'
 
 // Different types of message bubbles.
 
@@ -37,7 +37,7 @@ export function BotMessage({
   return (
     <div className={cn('group relative flex items-start md:-ml-12', className)}>
       <div className="flex size-[24px] shrink-0 select-none items-center justify-center rounded-md border bg-primary text-primary-foreground shadow-sm">
-        <IconOpenAI />
+        <IconAnthropic />
       </div>
       <div className="ml-4 flex-1 space-y-2 overflow-hidden px-1">
         <MemoizedReactMarkdown
@@ -101,7 +101,7 @@ export function BotCard({
           !showAvatar && 'invisible'
         )}
       >
-        <IconOpenAI />
+        <IconAnthropic />
       </div>
       <div className="ml-4 flex-1 pl-2">{children}</div>
     </div>
@@ -124,7 +124,7 @@ export function SpinnerMessage() {
   return (
     <div className="group relative flex items-start md:-ml-12">
       <div className="flex size-[24px] shrink-0 select-none items-center justify-center rounded-md border bg-primary text-primary-foreground shadow-sm">
-        <IconOpenAI />
+        <IconAnthropic />
       </div>
       <div className="ml-4 h-[24px] flex flex-row items-center flex-1 space-y-2 overflow-hidden px-1">
         {spinner}
