@@ -8,7 +8,7 @@ export function EmptyScreen() {
           Dagbladet AI Helper!
         </h1>
         <p className="leading-normal text-muted-foreground">
-          This is an chatbot that will (hopefully) help you publish better articles.
+          This is a chatbot that will (hopefully) help you publish better articles.
         </p>
       </div>
     </div>
