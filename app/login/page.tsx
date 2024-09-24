@@ -1,5 +1,6 @@
 import { auth } from '@/auth'
-import LoginForm from '@/components/login-form'
+// import LoginForm from '@/components/login-form'
+import SigninForm from '@/components/sign-in'
 import { Session } from '@/lib/types'
 import { redirect } from 'next/navigation'
 
@@ -12,7 +13,8 @@ export default async function LoginPage() {
 
   return (
     <main className="flex flex-col p-4">
-      <LoginForm />
+      {/* <LoginForm /> */}
+      <SigninForm />
     </main>
   )
 }

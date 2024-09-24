@@ -1,45 +1,18 @@
+import { UpstashRedisAdapter } from "@auth/upstash-redis-adapter"
+import { Redis } from "@upstash/redis"
 import NextAuth from 'next-auth'
-import Credentials from 'next-auth/providers/credentials'
+import Resend from "next-auth/providers/resend"
 import { authConfig } from './auth.config'
-import { z } from 'zod'
-import { getStringFromBuffer } from './lib/utils'
-import { getUser } from './app/login/actions'
 
-export const { auth, signIn, signOut } = NextAuth({
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_URL!,
+  token: process.env.UPSTASH_REDIS_TOKEN!,
+})
+
+export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
+  adapter: UpstashRedisAdapter(redis, { baseKeyPrefix: "dagbladet-ai-chatbot:" }),
   providers: [
-    Credentials({
-      async authorize(credentials) {
-        const parsedCredentials = z
-          .object({
-            email: z.string().email(),
-            password: z.string().min(6)
-          })
-          .safeParse(credentials)
-
-        if (parsedCredentials.success) {
-          const { email, password } = parsedCredentials.data
-          const user = await getUser(email)
-
-          if (!user) return null
-
-          const encoder = new TextEncoder()
-          const saltedPassword = encoder.encode(password + user.salt)
-          const hashedPasswordBuffer = await crypto.subtle.digest(
-            'SHA-256',
-            saltedPassword
-          )
-          const hashedPassword = getStringFromBuffer(hashedPasswordBuffer)
-
-          if (hashedPassword === user.password) {
-            return user
-          } else {
-            return null
-          }
-        }
-
-        return null
-      }
-    })
+    Resend({ from: "signin@email.mediehub.net" }),
   ]
 })

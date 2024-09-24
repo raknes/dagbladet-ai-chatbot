@@ -499,15 +499,10 @@ function IconDagbladet({ className, ...props }: React.ComponentProps<'svg'>) {
     xmlnsXlink="http://www.w3.org/1999/xlink"
     xmlSpace="preserve"
     overflow="visible"
+    viewBox='0 0 330 93'
     {...props}
   >
-    <g transform="matrix(1.01477 0 0 1.01477 -3.933 -.004)">
-      <defs>
-        <path id="a" d="M0 .253h324.255v94.422H0" />
-      </defs>
-      <clipPath id="b">
-        <use xlinkHref="#a" width={325.96} height={94.675} />
-      </clipPath>
+    <g>
       <path
         d="M325.96 93.276V0H4.948v93.276"
         clipPath="url(#b)"

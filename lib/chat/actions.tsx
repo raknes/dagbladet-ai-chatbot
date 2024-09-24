@@ -4,6 +4,7 @@ import { anthropic } from '@ai-sdk/anthropic'
 import {
   createAI,
   createStreamableValue,
+  getAIState,
   getMutableAIState,
   streamUI
 } from 'ai/rsc'
@@ -15,6 +16,8 @@ import {
   Stock
 } from '@/components/stocks'
 
+import { saveChat } from '@/app/actions'
+import { auth } from '@/auth'
 import { Events } from '@/components/stocks/events'
 import { SpinnerMessage, UserMessage } from '@/components/stocks/message'
 import { Stocks } from '@/components/stocks/stocks'
@@ -26,6 +29,12 @@ import {
 async function submitUserMessage(content: string) {
   'use server'
 
+  const session = await auth();
+  if (!session || !session.user) {
+    return {
+      display: 'You must be logged in to chat.'
+    };
+  }
   const aiState = getMutableAIState<typeof AI>()
 
   aiState.update({
@@ -201,51 +210,51 @@ export const AI = createAI<AIState, UIState>({
   },
   initialUIState: [],
   initialAIState: { chatId: nanoid(), messages: [] },
-  // onGetUIState: async () => {
-  //   'use server'
+  onGetUIState: async () => {
+    'use server'
 
-  //   const session = await auth()
+    const session = await auth()
 
-  //   if (session && session.user) {
-  //     const aiState = getAIState() as Chat
+    if (session && session.user) {
+      const aiState = getAIState() as Chat
 
-  //     if (aiState) {
-  //       const uiState = getUIStateFromAIState(aiState)
-  //       return uiState
-  //     }
-  //   } else {
-  //     return
-  //   }
-  // },
-  // onSetAIState: async ({ state }) => {
-  //   'use server'
+      if (aiState) {
+        const uiState = getUIStateFromAIState(aiState)
+        return uiState
+      }
+    } else {
+      return
+    }
+  },
+  onSetAIState: async ({ state }) => {
+    'use server'
 
-  //   const session = await auth()
+    const session = await auth()
 
-  //   if (session && session.user) {
-  //     const { chatId, messages } = state
+    if (session && session.user) {
+      const { chatId, messages } = state
 
-  //     const createdAt = new Date()
-  //     const userId = session.user.id as string
-  //     const path = `/chat/${chatId}`
+      const createdAt = new Date()
+      const userId = session.user.id as string
+      const path = `/chat/${chatId}`
 
-  //     const firstMessageContent = messages[0].content as string
-  //     const title = firstMessageContent.substring(0, 100)
+      const firstMessageContent = messages[0].content as string
+      const title = firstMessageContent.substring(0, 100)
 
-  //     const chat: Chat = {
-  //       id: chatId,
-  //       title,
-  //       userId,
-  //       createdAt,
-  //       messages,
-  //       path
-  //     }
+      const chat: Chat = {
+        id: chatId,
+        title,
+        userId,
+        createdAt,
+        messages,
+        path
+      }
 
-  //     await saveChat(chat)
-  //   } else {
-  //     return
-  //   }
-  // }
+      await saveChat(chat)
+    } else {
+      return
+    }
+  }
 })
 
 export const getUIStateFromAIState = (aiState: Chat) => {
