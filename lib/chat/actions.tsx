@@ -29,12 +29,12 @@ import {
 async function submitUserMessage(content: string) {
   'use server'
 
-  const session = await auth();
-  if (!session || !session.user) {
-    return {
-      display: 'You must be logged in to chat.'
-    };
-  }
+  // const session = await auth();
+  // if (!session || !session.user) {
+  //   return {
+  //     display: 'You must be logged in to chat.'
+  //   };
+  // }
   const aiState = getMutableAIState<typeof AI>()
 
   aiState.update({
