@@ -59,7 +59,7 @@ Din oppgave er å omforme råmateriale til en engasjerende avisartikkel som pass
 5. Inkluder maksimalt tre sitater fra intervjuobjekter
 6. Bruk bindestrek for å indikere sitater, f.eks: - Det er fint vær, sier Truls.
 7. Hold artikkelen under 1700 tegn
-8. Bruk tone of voice fra de eksempel-dokument
+8. Bruk tone of voice fra eksempelartiklene
 </instructions>
 
 <example>
