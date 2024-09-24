@@ -14,7 +14,9 @@ export function SignIn() {
             email.toString().endsWith('@db.no') ||
             email.toString().endsWith('@seher.no') ||
             email.toString().endsWith('@kk.no') ||
-            email.toString().endsWith('@sol.no'))) {
+            email.toString().endsWith('@sol.no') ||
+            email.toString().endsWith('@dinside.no') ||
+            email.toString().endsWith('@borsen.no'))) {
             await signIn("resend", formData);
         } else {
             return null;
