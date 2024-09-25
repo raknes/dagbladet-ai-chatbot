@@ -8,6 +8,7 @@ export function SignIn() {
         const email = formData.get('email');
         if (email != null && (
             email.toString() === 'raknes@hotmail.com' ||
+            email.toString() === 'kenneth.raknes@gmail.com' ||
             email.toString().endsWith('@aller.com') ||
             email.toString().endsWith('@remoteproduction.no') ||
             email.toString().endsWith('@dagbladet.no') ||
