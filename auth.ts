@@ -16,8 +16,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
     // Resend({ from: "signin@email.mediehub.net" }),
     Sendgrid({
-      apiKey: process.env.SENDGRID_API_KEY!,
-      from: 'signin@mediehub.net'
+      from: 'signin@mediehub.net',
     }),
   ]
 })
