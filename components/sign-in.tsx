@@ -18,7 +18,7 @@ export function SignIn() {
             email.toString().endsWith('@sol.no') ||
             email.toString().endsWith('@dinside.no') ||
             email.toString().endsWith('@borsen.no'))) {
-            await signIn("resend", formData);
+            await signIn("sendgrid", formData);
         } else {
             return null;
         }
