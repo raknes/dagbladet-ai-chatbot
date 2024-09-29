@@ -11,19 +11,19 @@ import {
 
 import {
   BotCard,
-  BotMessage,
   Purchase,
   Stock
 } from '@/components/stocks'
 
 import { saveChat } from '@/app/actions'
 import { auth } from '@/auth'
+import { BotArticleMessage } from '@/components/articles/article-message'
 import { Persons } from '@/components/articles/persons'
 import { PersonsSkeleton } from '@/components/articles/persons-skeleton'
 import { Questions } from '@/components/articles/questions'
 import { QuestionsSkeleton } from '@/components/articles/questions-skeleton'
 import { Events } from '@/components/stocks/events'
-import { SpinnerMessage, UserMessage } from '@/components/stocks/message'
+import { BotMessage, SpinnerMessage, UserMessage } from '@/components/stocks/message'
 import { Stocks } from '@/components/stocks/stocks'
 import { Chat, Message } from '@/lib/types'
 import {
@@ -46,7 +46,7 @@ Din oppgave er å omforme råmateriale til en engasjerende avisartikkel som pass
 6. Bruk bindestrek for å indikere sitater, f.eks: - Det er fint vær, sier Truls.
 7. Hold artikkelen under 1700 tegn
 8. Bruk tone of voice fra eksempelartiklene
-9. Svar kun med artikkeltekst, ikke forklar hva du gjør
+9. Svar kun med artikkeltekst, ikke oppsummer dine instruksjoner.
 </instructions>
 
 <example>
@@ -229,10 +229,11 @@ async function submitUserMessage(content: string) {
     text: ({ content, done, delta }) => {
       if (!textStream) {
         textStream = createStreamableValue('')
-        textNode = <BotMessage content={textStream.value} />
+        textNode = <BotArticleMessage content={textStream.value} index={aiState.get().messages.length} />
       }
 
       if (done) {
+        console.log('done', content);
         textStream.done()
         aiState.done({
           ...aiState.get(),
