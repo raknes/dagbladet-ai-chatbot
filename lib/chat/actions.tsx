@@ -18,44 +18,21 @@ import {
 
 import { saveChat } from '@/app/actions'
 import { auth } from '@/auth'
+import { Persons } from '@/components/articles/persons'
+import { PersonsSkeleton } from '@/components/articles/persons-skeleton'
+import { Questions } from '@/components/articles/questions'
+import { QuestionsSkeleton } from '@/components/articles/questions-skeleton'
 import { Events } from '@/components/stocks/events'
 import { SpinnerMessage, UserMessage } from '@/components/stocks/message'
 import { Stocks } from '@/components/stocks/stocks'
 import { Chat, Message } from '@/lib/types'
 import {
-  nanoid
+  nanoid,
+  sleep
 } from '@/lib/utils'
+import { z } from 'zod'
 
-async function submitUserMessage(content: string) {
-  'use server'
-
-  // const session = await auth();
-  // if (!session || !session.user) {
-  //   return {
-  //     display: 'You must be logged in to chat.'
-  //   };
-  // }
-  const aiState = getMutableAIState<typeof AI>()
-
-  aiState.update({
-    ...aiState.get(),
-    messages: [
-      ...aiState.get().messages,
-      {
-        id: nanoid(),
-        role: 'user',
-        content
-      }
-    ]
-  })
-
-  let textStream: undefined | ReturnType<typeof createStreamableValue<string>>
-  let textNode: undefined | React.ReactNode
-
-  const result = await streamUI({
-    model: anthropic('claude-3-5-sonnet-20240620'),
-    initial: <SpinnerMessage />,
-    system: `\
+const articlePrompt = `\
 Du er en svært dyktig og erfaren journalist i den norske avisa Dagbladet. Din spesialitet er å skrive sitatsaker.
 Når du får presentert en tekst, skal du omforme den til en god og lesbar avisartikkel på norsk.
 Din oppgave er å omforme råmateriale til en engasjerende avisartikkel som passer Dagbladets format og lesere. Det er svært viktig for bedriften at du ikke hallusinerer eller dikter opp ting som ikke er i det opprinnelige råmaterialet.
@@ -69,6 +46,7 @@ Din oppgave er å omforme råmateriale til en engasjerende avisartikkel som pass
 6. Bruk bindestrek for å indikere sitater, f.eks: - Det er fint vær, sier Truls.
 7. Hold artikkelen under 1700 tegn
 8. Bruk tone of voice fra eksempelartiklene
+9. Svar kun med artikkeltekst, ikke forklar hva du gjør
 </instructions>
 
 <example>
@@ -151,7 +129,96 @@ Den tidligere argentinske landslagskeeperen måtte holdes tilbake av både spill
 Se klipp fra hendelsen her:
 Tidligere West Ham-spiller Manuel Lanzini scoret kampens eneste mål. På overtid fikk hjemmelagets midtstopper Cristian Lema det røde kortet.
 </example>
-`,
+
+- Om brukeren ber om å få se en liste over alle personer som nevnes i artikkelen, kall \`get_persons\` for å liste personer.
+- Om brukeren ber om oppfølgingsspørsmål, kall \`follow_up\` for å generere spørsmål.
+- Om brukeren ber om å få se en liste over alle hendelser som nevnes i artikkelen, si at dette ikke er implementert enda.
+Ellers kan chatte med brukeren om hva som helst.
+`;
+
+const getPersonsPrompt = `\
+Identifiser og list alle personer som nevnes i artikkelen.
+Inkluder fullt navn, alder og stilling eller rolle om det er tilgjengelig.
+Ikke gjør antagelser eller legg til informasjon som ikke er i kildeteksten.
+Hvis en person nevnes flere ganger, skal de kun listes opp én gang.
+Hvis en persons stilling eller rolle ikke er nevnt, skriv "(Stilling ikke oppgitt)".
+Vær oppmerksom på at noen personer kan nevnes flere ganger med ulike titler eller roller. I slike tilfeller, inkluder alle relevante titler/roller.
+`;
+
+const followUpPrompt = `\
+Du er en erfaren gravejournalist med ekspertise i å identifisere hull i nyhetsdekning og formulere dyptgående oppfølgingsspørsmål.
+Din oppgave er å analysere en gitt sitatsak og generere fem relevante oppfølgingsspørsmål. Disse spørsmålene skal enten adressere temaer som er dårlig belyst i artikkelen eller introdusere nye, relevante vinkler som ikke er nevnt.
+
+<instructions>
+1. Les gjennom hele sitatsaken nøye.
+2. Identifiser hovedtemaet og undertemaer i artikkelen.
+3. Vurder hvilke aspekter av saken som er mangelfullt dekket eller helt utelatt.
+4. Generer fem spesifikke oppfølgingsspørsmål basert på din analyse.
+5. Spørsmålene skal være:
+   - Relevante for sakens tema
+   - Egnet til å utdype eller utvide dekningen
+   - Formulert på en måte som oppmuntrer til detaljerte svar
+   - Balanserte og upartiske
+   - Egnet for å stille til en av personene nevnt i artikkelen
+6. Presenter spørsmålene i en nummerert liste.
+7. For hvert spørsmål, gi en kort begrunnelse for hvorfor det er relevant (maks én setning).
+8. Svar alltid på norsk.
+</instructions>
+
+<context>
+Denne analysen og genereringen av oppfølgingsspørsmål er viktig for å omdanne en sitatsak til original journalistikk.
+Ved å identifisere og følge opp på ubesvarte spørsmål eller nye vinkler, kan journalister skape mer dybde i sin rapportering og potensielt avdekke viktig informasjon som ellers ville forblitt skjult.
+Dette bidrar til å øke kvaliteten og verdien av journalistikken for leserne.
+Fokuser på å finne vinkler som kan gi mer dybde og kontekst til den opprinnelige saken.
+Unngå ledende eller partiske spørsmål.
+Spørsmålene bør være åpne og gi rom for utfyllende svar.
+Vær oppmerksom på potensielle samfunnsmessige, økonomiske, eller politiske implikasjoner som ikke er adressert i den originale artikkelen.
+Tenk på hvilken informasjon leserne vil finne mest verdifull og interessant.
+Husk at målet er å skape original journalistikk basert på sitatsaken, så spørsmålene bør oppmuntre til nye avsløringer eller perspektiver.
+</context>
+
+<examlple>
+<prompt>Sitatsak om ny klimaplan der statsministeren lover kutt i utslipp, men uten spesifikke tiltak</prompt>
+<assistant>
+1. Hvilke konkrete tiltak planlegger regjeringen for å nå utslippsmålene? (Begrunnelse: Artikkelen mangler spesifikke detaljer om planlagte tiltak.)
+2. Hvordan vil disse utslippskuttene påvirke ulike industrier og arbeidsplasser? (Begrunnelse: Økonomiske konsekvenser er ikke adressert i den originale artikkelen.)
+3. Hva er tidshorisonten for implementeringen av klimaplanen? (Begrunnelse: Tidsaspektet er ikke tydelig kommunisert i sitatsaken.)
+4. Hvordan samarbeider regjeringen med opposisjonen og næringslivet om denne planen? (Begrunnelse: Artikkelen nevner ikke samarbeid eller konsensusbygging.)
+5. Hvilke internasjonale forpliktelser eller avtaler har påvirket utformingen av denne klimaplanen? (Begrunnelse: Den globale konteksten for klimatiltak er ikke belyst i den opprinnelige saken.)
+</assistant>
+</example>
+`;
+
+async function submitUserMessage(content: string) {
+  'use server'
+
+  // const session = await auth();
+  // if (!session || !session.user) {
+  //   return {
+  //     display: 'You must be logged in to chat.'
+  //   };
+  // }
+  const aiState = getMutableAIState<typeof AI>()
+
+  aiState.update({
+    ...aiState.get(),
+    messages: [
+      ...aiState.get().messages,
+      {
+        id: nanoid(),
+        role: 'user',
+        content
+      }
+    ]
+  })
+
+  let textStream: undefined | ReturnType<typeof createStreamableValue<string>>
+  let textNode: undefined | React.ReactNode
+
+  const result = await streamUI({
+    model: anthropic('claude-3-5-sonnet-20240620'),
+    initial: <SpinnerMessage />,
+    system: articlePrompt,
     messages: [
       ...aiState.get().messages.map((message: any) => ({
         role: message.role,
@@ -185,6 +252,124 @@ Tidligere West Ham-spiller Manuel Lanzini scoret kampens eneste mål. På overti
       return textNode
     },
     tools: {
+      getPersons: {
+        description: getPersonsPrompt,
+        parameters: z.object({
+          persons: z.array(
+            z.object({
+              name: z.string().describe('The name of the person'),
+              age: z.string().describe('The age of the person'),
+              role: z.string().describe('The role or position of the person')
+            })
+          )
+        }),
+        generate: async function* ({ persons }) {
+          yield (
+            <BotCard>
+              <PersonsSkeleton />
+            </BotCard>
+          )
+
+          await sleep(1000)
+
+          const toolCallId = nanoid()
+
+          aiState.done({
+            ...aiState.get(),
+            messages: [
+              ...aiState.get().messages,
+              {
+                id: nanoid(),
+                role: 'assistant',
+                content: [
+                  {
+                    type: 'tool-call',
+                    toolName: 'getPersons',
+                    toolCallId,
+                    args: { persons }
+                  }
+                ]
+              },
+              {
+                id: nanoid(),
+                role: 'tool',
+                content: [
+                  {
+                    type: 'tool-result',
+                    toolName: 'getPersons',
+                    toolCallId,
+                    result: persons
+                  }
+                ]
+              }
+            ]
+          })
+
+          return (
+            <BotCard>
+              <Persons props={persons} />
+            </BotCard>
+          )
+        }
+      },
+      followUp: {
+        description: followUpPrompt,
+        parameters: z.object({
+          questions: z.array(
+            z.object({
+              text: z.string().describe('The follow-up question text'),
+            })
+          )
+        }),
+        generate: async function* ({ questions }) {
+          yield (
+            <BotCard>
+              <QuestionsSkeleton />
+            </BotCard>
+          )
+
+          await sleep(1000)
+
+          const toolCallId = nanoid()
+
+          aiState.done({
+            ...aiState.get(),
+            messages: [
+              ...aiState.get().messages,
+              {
+                id: nanoid(),
+                role: 'assistant',
+                content: [
+                  {
+                    type: 'tool-call',
+                    toolName: 'followUp',
+                    toolCallId,
+                    args: { questions }
+                  }
+                ]
+              },
+              {
+                id: nanoid(),
+                role: 'tool',
+                content: [
+                  {
+                    type: 'tool-result',
+                    toolName: 'followUp',
+                    toolCallId,
+                    result: questions
+                  }
+                ]
+              }
+            ]
+          })
+
+          return (
+            <BotCard>
+              <Questions props={questions} />
+            </BotCard>
+          )
+        }
+      }
     }
   })
 
@@ -285,6 +470,11 @@ export const getUIStateFromAIState = (aiState: Chat) => {
               <BotCard>
                 {/* @ts-expect-error */}
                 <Events props={tool.result} />
+              </BotCard>
+            ) : tool.toolName === 'getPersons' ? (
+              <BotCard>
+                {/* @ts-expect-error */}
+                <Persons props={tool.result} />
               </BotCard>
             ) : null
           })
