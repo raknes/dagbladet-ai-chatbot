@@ -233,7 +233,7 @@ async function submitUserMessage(content: string) {
       }
 
       if (done) {
-        console.log('done', content);
+        console.log('done - text');
         textStream.done()
         aiState.done({
           ...aiState.get(),
