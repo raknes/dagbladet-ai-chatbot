@@ -26,7 +26,7 @@ export function Persons({ props: persons }: { props: Person[] }) {
           {person.name !== '(Navn ikke oppgitt)' &&
           <div className="text-zinc-500">
             <ExternalLink href={`https://www.google.com/search?q=${person.name}`}>Google</ExternalLink>
-            <ExternalLink href={`https://www.1881.no/query=${person.name.replaceAll(' ', '+')}`}>1881</ExternalLink>
+            <ExternalLink href={`https://www.1881.no/?query=${person.name.replaceAll(' ', '+')}`}>1881</ExternalLink>
           </div>
           }
         </div>

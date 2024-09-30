@@ -53,8 +53,8 @@ export function BotArticleMessage({
             p({ children }) {
               return <p className="mb-2 last:mb-0">{children}</p>
             },
-            code({ node, inline, className, children, ...props }) {
-              if (children.length) {
+            code({ node, className, children, ...props }) {
+              if (children && Array.isArray(children) && children.length) {
                 if (children[0] == '▍') {
                   return (
                     <span className="mt-1 animate-pulse cursor-default">▍</span>
@@ -66,13 +66,13 @@ export function BotArticleMessage({
 
               const match = /language-(\w+)/.exec(className || '')
 
-              if (inline) {
-                return (
-                  <code className={className} {...props}>
-                    {children}
-                  </code>
-                )
-              }
+              // if (inline) {
+              //   return (
+              //     <code className={className} {...props}>
+              //       {children}
+              //     </code>
+              //   )
+              // }
 
               return (
                 <CodeBlock
