@@ -1,36 +1,37 @@
-import 'server-only'
+import 'server-only';
 
-import { anthropic } from '@ai-sdk/anthropic'
+import { anthropic } from '@ai-sdk/anthropic';
+import { track } from '@vercel/analytics';
 import {
   createAI,
   createStreamableValue,
   getAIState,
   getMutableAIState,
   streamUI
-} from 'ai/rsc'
+} from 'ai/rsc';
 
 import {
   BotCard,
   Purchase,
   Stock
-} from '@/components/stocks'
+} from '@/components/stocks';
 
-import { saveChat } from '@/app/actions'
-import { auth } from '@/auth'
-import { BotArticleMessage } from '@/components/articles/article-message'
-import { Persons } from '@/components/articles/persons'
-import { PersonsSkeleton } from '@/components/articles/persons-skeleton'
-import { Questions } from '@/components/articles/questions'
-import { QuestionsSkeleton } from '@/components/articles/questions-skeleton'
-import { Events } from '@/components/stocks/events'
-import { BotMessage, SpinnerMessage, UserMessage } from '@/components/stocks/message'
-import { Stocks } from '@/components/stocks/stocks'
-import { Chat, Message } from '@/lib/types'
+import { saveChat } from '@/app/actions';
+import { auth } from '@/auth';
+import { BotArticleMessage } from '@/components/articles/article-message';
+import { Persons } from '@/components/articles/persons';
+import { PersonsSkeleton } from '@/components/articles/persons-skeleton';
+import { Questions } from '@/components/articles/questions';
+import { QuestionsSkeleton } from '@/components/articles/questions-skeleton';
+import { Events } from '@/components/stocks/events';
+import { BotMessage, SpinnerMessage, UserMessage } from '@/components/stocks/message';
+import { Stocks } from '@/components/stocks/stocks';
+import { Chat, Message } from '@/lib/types';
 import {
   nanoid,
   sleep
-} from '@/lib/utils'
-import { z } from 'zod'
+} from '@/lib/utils';
+import { z } from 'zod';
 
 const articlePrompt = `\
 Du er en svært dyktig og erfaren journalist i den norske avisa Dagbladet. Din spesialitet er å skrive sitatsaker.
@@ -133,7 +134,7 @@ Tidligere West Ham-spiller Manuel Lanzini scoret kampens eneste mål. På overti
 - Om brukeren ber om å få se en liste over alle personer som nevnes i artikkelen, kall \`get_persons\` for å liste personer.
 - Om brukeren ber om oppfølgingsspørsmål, kall \`follow_up\` for å generere spørsmål.
 - Om brukeren ber om å få se en liste over alle hendelser som nevnes i artikkelen, si at dette ikke er implementert enda.
-Ellers kan chatte med brukeren om hva som helst.
+Ellers kan du chatte med brukeren om hva som helst.
 `;
 
 const getPersonsPrompt = `\
@@ -249,7 +250,7 @@ async function submitUserMessage(content: string) {
       } else {
         textStream.update(delta)
       }
-
+      track('ai-response');
       return textNode
     },
     tools: {

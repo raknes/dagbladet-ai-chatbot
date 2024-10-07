@@ -1,3 +1,4 @@
+import { track } from '@vercel/analytics';
 import { signIn } from "../auth";
  
 export function SignIn() {
@@ -18,7 +19,8 @@ export function SignIn() {
             email.toString().endsWith('@sol.no') ||
             email.toString().endsWith('@dinside.no') ||
             email.toString().endsWith('@borsen.no'))) {
-            await signIn("sendgrid", formData);
+              track("sign-in");
+              await signIn("sendgrid", formData);
         } else {
             return null;
         }
