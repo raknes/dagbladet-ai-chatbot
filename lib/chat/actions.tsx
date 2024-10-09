@@ -1,7 +1,7 @@
 import 'server-only';
 
 import { anthropic } from '@ai-sdk/anthropic';
-import { track } from '@vercel/analytics';
+import { track } from '@vercel/analytics/server';
 import {
   createAI,
   createStreamableValue,

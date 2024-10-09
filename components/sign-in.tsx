@@ -1,4 +1,4 @@
-import { track } from '@vercel/analytics';
+import { track } from '@vercel/analytics/server';
 import { signIn } from "../auth";
  
 export function SignIn() {
