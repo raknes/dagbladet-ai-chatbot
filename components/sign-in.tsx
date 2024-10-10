@@ -19,7 +19,7 @@ export function SignIn() {
             email.toString().endsWith('@sol.no') ||
             email.toString().endsWith('@dinside.no') ||
             email.toString().endsWith('@borsen.no'))) {
-              track("sign-in");
+              await track("sign-in");
               await signIn("sendgrid", formData);
         } else {
             return null;

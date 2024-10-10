@@ -1,6 +1,5 @@
 import 'server-only';
 
-import { track } from '@vercel/analytics/server';
 import {
   createAI,
   createStreamableValue,
@@ -235,7 +234,7 @@ async function submitUserMessage(content: string, provider: string = 'Anthropic'
 
   let textStream: undefined | ReturnType<typeof createStreamableValue<string>>
   let textNode: undefined | React.ReactNode
-  console.log('submitUserMessage', content, provider, model);
+  console.log('submitUserMessage', provider, model);
   const result = await streamUI({
     model: (provider === 'Anthropic' ? anthropic(model ?? 'claude-3-haiku-20240307') : openai(model ?? 'gpt-4o-mini')),
     initial: <SpinnerMessage />,
@@ -254,7 +253,6 @@ async function submitUserMessage(content: string, provider: string = 'Anthropic'
       }
 
       if (done) {
-        console.log('done - text');
         textStream.done()
         aiState.done({
           ...aiState.get(),
@@ -270,7 +268,6 @@ async function submitUserMessage(content: string, provider: string = 'Anthropic'
       } else {
         textStream.update(delta)
       }
-      track('ai-response');
       return textNode
     },
     tools: {
