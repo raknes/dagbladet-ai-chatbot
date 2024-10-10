@@ -147,7 +147,7 @@ Hvis en persons stilling eller rolle ikke er nevnt, skriv "(Stilling ikke oppgit
 Vær oppmerksom på at noen personer kan nevnes flere ganger med ulike titler eller roller. I slike tilfeller, inkluder alle relevante titler/roller.
 `;
 
-const followUpPrompt1 = `\
+const followUpPrompt = `\
 Du er en erfaren gravejournalist med ekspertise i å identifisere hull i nyhetsdekning og formulere dyptgående oppfølgingsspørsmål.
 Din oppgave er å analysere en gitt sitatsak og generere fem relevante oppfølgingsspørsmål. Disse spørsmålene skal enten adressere temaer som er dårlig belyst i artikkelen eller introdusere nye, relevante vinkler som ikke er nevnt.
 
@@ -190,7 +190,7 @@ Husk at målet er å skape original journalistikk basert på sitatsaken, så sp�
 </assistant>
 </example>
 `;
-const followUpPrompt = `\
+const followUpPromptOpenAI = `\
 Du er en erfaren gravejournalist med ekspertise i å identifisere hull i nyhetsdekning og formulere dyptgående oppfølgingsspørsmål.
 Din oppgave er å analysere en gitt sitatsak og generere fem relevante oppfølgingsspørsmål. Disse spørsmålene skal enten adressere temaer som er dårlig belyst i artikkelen eller introdusere nye, relevante vinkler som ikke er nevnt.
 
@@ -335,7 +335,7 @@ async function submitUserMessage(content: string, provider: string = 'Anthropic'
         }
       },
       followUp: {
-        description: followUpPrompt,
+        description: provider === 'OpenAI' ? followUpPromptOpenAI : followUpPrompt,
         parameters: z.object({
           questions: z.array(
             z.object({
