@@ -1,6 +1,5 @@
 import 'server-only';
 
-import { anthropic } from '@ai-sdk/anthropic';
 import { track } from '@vercel/analytics/server';
 import {
   createAI,
@@ -31,6 +30,8 @@ import {
   nanoid,
   sleep
 } from '@/lib/utils';
+import { anthropic } from '@ai-sdk/anthropic';
+import { openai } from '@ai-sdk/openai';
 import { z } from 'zod';
 
 const articlePrompt = `\
@@ -146,7 +147,7 @@ Hvis en persons stilling eller rolle ikke er nevnt, skriv "(Stilling ikke oppgit
 Vær oppmerksom på at noen personer kan nevnes flere ganger med ulike titler eller roller. I slike tilfeller, inkluder alle relevante titler/roller.
 `;
 
-const followUpPrompt = `\
+const followUpPrompt1 = `\
 Du er en erfaren gravejournalist med ekspertise i å identifisere hull i nyhetsdekning og formulere dyptgående oppfølgingsspørsmål.
 Din oppgave er å analysere en gitt sitatsak og generere fem relevante oppfølgingsspørsmål. Disse spørsmålene skal enten adressere temaer som er dårlig belyst i artikkelen eller introdusere nye, relevante vinkler som ikke er nevnt.
 
@@ -189,8 +190,27 @@ Husk at målet er å skape original journalistikk basert på sitatsaken, så sp�
 </assistant>
 </example>
 `;
+const followUpPrompt = `\
+Du er en erfaren gravejournalist med ekspertise i å identifisere hull i nyhetsdekning og formulere dyptgående oppfølgingsspørsmål.
+Din oppgave er å analysere en gitt sitatsak og generere fem relevante oppfølgingsspørsmål. Disse spørsmålene skal enten adressere temaer som er dårlig belyst i artikkelen eller introdusere nye, relevante vinkler som ikke er nevnt.
 
-async function submitUserMessage(content: string) {
+<instructions>
+1. Les gjennom hele sitatsaken nøye.
+2. Identifiser hovedtemaet og undertemaer i artikkelen.
+3. Vurder hvilke aspekter av saken som er mangelfullt dekket eller helt utelatt.
+4. Generer fem spesifikke oppfølgingsspørsmål basert på din analyse.
+5. Spørsmålene skal være:
+   - Egnet til å utdype eller utvide dekningen
+   - Formulert på en måte som oppmuntrer til detaljerte svar
+   - Balanserte og upartiske
+   - Egnet for å stille til en av personene nevnt i artikkelen
+6. Presenter spørsmålene i en nummerert liste.
+7. For hvert spørsmål, gi en kort begrunnelse for hvorfor det er relevant (maks én setning).
+8. Svar på norsk.
+</instructions>
+`;
+
+async function submitUserMessage(content: string, provider: string = 'Anthropic', model: string = 'claude-3-haiku-20240307') {
   'use server'
 
   // const session = await auth();
@@ -215,9 +235,9 @@ async function submitUserMessage(content: string) {
 
   let textStream: undefined | ReturnType<typeof createStreamableValue<string>>
   let textNode: undefined | React.ReactNode
-
+  console.log('submitUserMessage', content, provider, model);
   const result = await streamUI({
-    model: anthropic('claude-3-5-sonnet-20240620'),
+    model: (provider === 'Anthropic' ? anthropic(model ?? 'claude-3-haiku-20240307') : openai(model ?? 'gpt-4o-mini')),
     initial: <SpinnerMessage />,
     system: articlePrompt,
     messages: [

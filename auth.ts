@@ -16,5 +16,5 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
     // Resend({ from: "signin@mediehub.net" }),
     Sendgrid({ from: 'signin@mediehub.net' }),
-  ]
+  ],
 })

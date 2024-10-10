@@ -26,6 +26,8 @@ export interface Session {
     id: string
     email: string
   }
+  aiProvider?: string;
+  aiModel?: string;
 }
 
 export interface AuthResult {

@@ -5,8 +5,6 @@ import Textarea from 'react-textarea-autosize'
 
 import { useActions, useUIState } from 'ai/rsc'
 
-import { UserMessage } from './stocks/message'
-import { type AI } from '@/lib/chat/actions'
 import { Button } from '@/components/ui/button'
 import { IconArrowElbow, IconPlus } from '@/components/ui/icons'
 import {
@@ -14,9 +12,11 @@ import {
   TooltipContent,
   TooltipTrigger
 } from '@/components/ui/tooltip'
+import { type AI } from '@/lib/chat/actions'
 import { useEnterSubmit } from '@/lib/hooks/use-enter-submit'
 import { nanoid } from 'nanoid'
 import { useRouter } from 'next/navigation'
+import { UserMessage } from './stocks/message'
 
 export function PromptForm({
   input,
@@ -28,9 +28,10 @@ export function PromptForm({
   const router = useRouter()
   const { formRef, onKeyDown } = useEnterSubmit()
   const inputRef = React.useRef<HTMLTextAreaElement>(null)
-  const { submitUserMessage } = useActions()
+  const actions = useActions()
   const [_, setMessages] = useUIState<typeof AI>()
 
+  console.log('actions', actions);
   React.useEffect(() => {
     if (inputRef.current) {
       inputRef.current.focus()
@@ -62,7 +63,7 @@ export function PromptForm({
         ])
 
         // Submit and get response message
-        const responseMessage = await submitUserMessage(value)
+        const responseMessage = await actions.submitUserMessage(value, localStorage.getItem('aiProvider') || 'Anthropic', localStorage.getItem('aiModel') || 'claude-3-5-sonnet-20240620')
         setMessages(currentMessages => [...currentMessages, responseMessage])
       }}
     >

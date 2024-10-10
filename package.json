@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^0.0.51",
+    "@ai-sdk/openai": "^0.0.66",
     "@auth/upstash-redis-adapter": "^2.5.3",
     "@radix-ui/react-alert-dialog": "^1.1.1",
     "@radix-ui/react-dialog": "^1.1.1",

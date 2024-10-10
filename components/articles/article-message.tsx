@@ -1,6 +1,6 @@
 'use client'
 
-import { IconAnthropic, IconUser } from '@/components/ui/icons'
+import { IconAnthropic, IconOpenAI, IconUser } from '@/components/ui/icons'
 import { AI } from '@/lib/chat/actions'
 import { useStreamableText } from '@/lib/hooks/use-streamable-text'
 import { cn } from '@/lib/utils'
@@ -43,7 +43,7 @@ export function BotArticleMessage({
     <>
     <div className={cn('group relative flex items-start md:-ml-12', className)}>
       <div className="flex size-[24px] shrink-0 select-none items-center justify-center rounded-md border bg-primary text-primary-foreground shadow-sm">
-        <IconAnthropic />
+        {localStorage.getItem('aiModel') === 'OpenAI' ? <IconOpenAI /> : <IconAnthropic />}
       </div>
       <div className="ml-4 flex-1 space-y-2 overflow-hidden px-1">
         <MemoizedReactMarkdown
@@ -92,11 +92,11 @@ export function BotArticleMessage({
     {index <= 1 &&
     <>
     <ButtonAction actionTitle='Finn personer' callAction={async () => {
-        const responseMessage = await submitUserMessage('Finn personer i artikkelen');  
+        const responseMessage = await submitUserMessage('Finn personer i artikkelen', localStorage.getItem('aiProvider') || 'Anthropic', localStorage.getItem('aiModel') || 'claude-3-5-sonnet-20240620');
         setMessages(currentMessages => [...currentMessages, responseMessage]);
     }} className='w-2/4' />
     <ButtonAction actionTitle='Oppfølgingsspørsmål' callAction={async () => {
-        const responseMessage = await submitUserMessage('Gi meg noen oppfølgingsspørsmål');  
+        const responseMessage = await submitUserMessage('Gi meg noen oppfølgingsspørsmål', localStorage.getItem('aiProvider') || 'Anthropic', localStorage.getItem('aiModel') || 'claude-3-5-sonnet-20240620');
         setMessages(currentMessages => [...currentMessages, responseMessage]);
     }} className='w-2/4' />
     </>
@@ -120,7 +120,7 @@ export function BotCard({
           !showAvatar && 'invisible'
         )}
       >
-        <IconAnthropic />
+        {localStorage.getItem('aiModel') === 'OpenAI' ? <IconOpenAI/> : <IconAnthropic />}
       </div>
       <div className="ml-4 flex-1 pl-2">{children}</div>
     </div>
@@ -143,7 +143,7 @@ export function SpinnerMessage() {
   return (
     <div className="group relative flex items-start md:-ml-12">
       <div className="flex size-[24px] shrink-0 select-none items-center justify-center rounded-md border bg-primary text-primary-foreground shadow-sm">
-        <IconAnthropic />
+        {localStorage.getItem('aiModel') === 'OpenAI' ? <IconOpenAI/> : <IconAnthropic />}
       </div>
       <div className="ml-4 h-[24px] flex flex-row items-center flex-1 space-y-2 overflow-hidden px-1">
         {spinner}
