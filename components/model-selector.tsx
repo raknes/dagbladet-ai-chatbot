@@ -4,8 +4,8 @@ import { useEffect, useState } from 'react';
 import { z } from 'zod';
 
 const aiProviders = [
-  { name: 'Anthropic', models: ['claude-3-5-sonnet-20240620', 'claude-3-haiku-20240307'] },
-  { name: 'OpenAI', models: ['gpt-4o-mini', 'gpt-4o', 'gpt-3.5-turbo'] },
+  { name: 'Anthropic', models: ['claude-3-5-sonnet-20240620'] }, //, 'claude-3-haiku-20240307'] },
+  // { name: 'OpenAI', models: ['gpt-4o-mini', 'gpt-4o', 'gpt-3.5-turbo'] },
 ];
 
 export const AIProviderSchema = z.object({
