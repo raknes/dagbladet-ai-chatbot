@@ -63,7 +63,7 @@ export function PromptForm({
         ])
 
         // Submit and get response message
-        const responseMessage = await actions.submitUserMessage(value, localStorage.getItem('aiProvider') || 'Anthropic', localStorage.getItem('aiModel') || 'claude-3-5-sonnet-20240620')
+        const responseMessage = await actions.submitUserMessage(value, 'Anthropic', 'claude-3-5-sonnet-20240620') // localStorage.getItem('aiProvider') || 'Anthropic', localStorage.getItem('aiModel') || 'claude-3-5-sonnet-20240620')
         setMessages(currentMessages => [...currentMessages, responseMessage])
       }}
     >

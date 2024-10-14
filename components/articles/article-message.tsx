@@ -92,11 +92,11 @@ export function BotArticleMessage({
     {index <= 1 &&
     <>
     <ButtonAction actionTitle='Finn personer' callAction={async () => {
-        const responseMessage = await submitUserMessage('Finn personer i artikkelen', localStorage.getItem('aiProvider') || 'Anthropic', localStorage.getItem('aiModel') || 'claude-3-5-sonnet-20240620');
+        const responseMessage = await submitUserMessage('Finn personer i artikkelen', 'Anthropic', 'claude-3-5-sonnet-20240620') // localStorage.getItem('aiProvider') || 'Anthropic', localStorage.getItem('aiModel') || 'claude-3-5-sonnet-20240620');
         setMessages(currentMessages => [...currentMessages, responseMessage]);
     }} className='w-2/4' />
     <ButtonAction actionTitle='Oppfølgingsspørsmål' callAction={async () => {
-        const responseMessage = await submitUserMessage('Gi meg noen oppfølgingsspørsmål', localStorage.getItem('aiProvider') || 'Anthropic', localStorage.getItem('aiModel') || 'claude-3-5-sonnet-20240620');
+        const responseMessage = await submitUserMessage('Gi meg noen oppfølgingsspørsmål', 'Anthropic', 'claude-3-5-sonnet-20240620') // localStorage.getItem('aiProvider') || 'Anthropic', localStorage.getItem('aiModel') || 'claude-3-5-sonnet-20240620');
         setMessages(currentMessages => [...currentMessages, responseMessage]);
     }} className='w-2/4' />
     </>
