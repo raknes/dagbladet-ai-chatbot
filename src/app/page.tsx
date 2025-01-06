@@ -22,7 +22,7 @@ export default function Home() {
         </ul>
 
       </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center bg-slate-800">
+      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center bg-slate-700">
         <a
           href="https://www.remoteproduction.no"
           target="_blank"
@@ -31,9 +31,9 @@ export default function Home() {
           <span className="sr-only">Remote Production AS 2025</span>
           <Image
             src="/logo.png"
-            alt="Vercel Logo"
-            width={72}
-            height={16}
+            alt="Remote Production Logo"
+            width={110}
+            height={48}
           />
         </a>
       </footer>
