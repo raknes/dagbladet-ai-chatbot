@@ -22,15 +22,15 @@ export default function Home() {
         </ul>
 
       </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
+      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center bg-slate-800">
         <a
-          href="https://aller.mediehub.net"
+          href="https://www.remoteproduction.no"
           target="_blank"
           rel="noopener noreferrer"
         >
-          <span className="sr-only">Powered by Mediehub</span>
+          <span className="sr-only">Remote Production AS 2025</span>
           <Image
-            src="/mediehub.png"
+            src="/logo.png"
             alt="Vercel Logo"
             width={72}
             height={16}
