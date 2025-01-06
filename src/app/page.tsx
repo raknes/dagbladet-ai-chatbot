@@ -10,7 +10,7 @@ export default function Home() {
           <li className="mb-2">
             <a
               className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
+              href="https://platform.ai.aller.com/"
               target="_blank"
               rel="noopener noreferrer"
             >
